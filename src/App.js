@@ -1,12 +1,22 @@
+import { useState } from 'react'
 import Container from '@material-ui/core/Container';
+import { SnackbarProvider } from 'notistack';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { SignUp } from './components/SignUp'
+import { Main } from './components/Main'
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null)
+
+  onAuthStateChanged(getAuth(), setUser);
+
   return (
-    <Container style={{ display: 'flex', justifyContent: 'center' }}>
-      <SignUp />
-    </Container>
+    <SnackbarProvider maxSnack={3}>
+      <Container>
+        {user ? <Main userEmail={user.email} /> : <SignUp />}
+      </Container>
+    </SnackbarProvider>
   );
 }
 
