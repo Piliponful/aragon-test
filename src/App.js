@@ -14,7 +14,7 @@ const App = () => {
 
   return (
     <SnackbarProvider maxSnack={3}>
-      <Container>
+      <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         {user ? <Main userEmail={user.email} /> : <SignUp />}
         <Top5List />
       </Container>

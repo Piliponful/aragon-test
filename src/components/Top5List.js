@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react'
-
-import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
+import { List, ListItem, ListItemText, Typography, Paper } from '@material-ui/core';
 
 const apiKey = 'b68a21be-5da2-441f-87d3-34cf05946b8b'
 
@@ -37,27 +34,32 @@ export const Top5List = () => {
 
   useEffect(() => {
     getAllCrypto()
-    const interval = setInterval(getAllCrypto, 10000)
+    // const interval = setInterval(getAllCrypto, 10000)
 
-    return () => clearInterval(interval)
+    // return () => clearInterval(interval)
   }, [])
   
   return (
-    <List dense={false}>
-      {top5List.map(i => (
-        <ListItem key={i.name}>
+    <Paper elevation={3} style={{ marginTop: 25, padding: '15px', width: 500, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+      <Typography variant="h6" gutterBottom>
+        Top 5 crypto + ANT
+      </Typography>
+      <List dense={false}>
+        {top5List.map(i => (
+          <ListItem key={i.name}>
+            <ListItemText
+              primary={i.name}
+              secondary={i.price}
+            />
+          </ListItem>
+        ))}
+        <ListItem>
           <ListItemText
-            primary={i.name}
-            secondary={i.price}
+            primary='Aragon'
+            secondary={ANTPrice}
           />
         </ListItem>
-      ))}
-      <ListItem>
-        <ListItemText
-          primary='Aragon'
-          secondary={ANTPrice}
-        />
-      </ListItem>
-    </List>
+      </List>
+    </Paper>
   )
 }

@@ -1,6 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField';
+import { useEffect, useState } from 'react'
+import { Typography, Paper, TextField, Button } from '@material-ui/core';
 import { useSnackbar } from 'notistack'
 import { getAuth, signOut } from 'firebase/auth'
 import { ethers, BigNumber } from 'ethers'
@@ -8,10 +7,11 @@ import { ethers, BigNumber } from 'ethers'
 import tokenABI from '../tokenABI.json'
 
 const contractAddress = '0xff10E56d8C3c1567E0c80677e26EC687B4f1D8D0'
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+let tokenContract = new ethers.Contract(contractAddress, tokenABI, provider);
+let myAddress = null
 
 export const Main = ({ userEmail }) => {
-  const providerRef = useRef(null)
-  const tokenContractRef = useRef(null)
   const [token, setToken] = useState({ symbol: '', myBalance: BigNumber.from('0'), totalSupply: BigNumber.from('0') })
   const [transferData, setTransferData] = useState({ addressTo: null, amount: 0 })
   const [amountError, setAmountError] = useState(false)
@@ -26,37 +26,21 @@ export const Main = ({ userEmail }) => {
     }
   }
 
-  const connectToMetamask = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    await provider.send("eth_requestAccounts", []);
-    providerRef.current = provider
-    setMetamaskConnected(true)
-  }
-
-  const getMyAddress = async () => {
-    const signer = providerRef.current.getSigner()
-    return signer.getAddress()
+  const setGlobals = async () => {
+    const signer = provider.getSigner()
+    tokenContract = tokenContract.connect(signer)
+    myAddress = await signer.getAddress()
   }
 
   const fetchTokenData = async () => {
-    const myAddress = await getMyAddress()
-
-    const symbol = await tokenContractRef.current.symbol();
-    const myBalance = await tokenContractRef.current.balanceOf(myAddress);
-    const totalSupply = await tokenContractRef.current.totalSupply()
+    const symbol = await tokenContract.symbol();
+    const myBalance = await tokenContract.balanceOf(myAddress);
+    const totalSupply = await tokenContract.totalSupply()
 
     setToken({ symbol, myBalance, totalSupply })
   }
-  
-  const initializeTokenContract = () => {
-    const tokenContract = new ethers.Contract(contractAddress, tokenABI, providerRef.current);
-    const signer = providerRef.current.getSigner()
-    tokenContractRef.current = tokenContract.connect(signer)
-  }
 
   const registerTransferListeners = async () => {
-    const myAddress = await getMyAddress()
-
     const fromMyAddress = {
       address: contractAddress,
       topics: [
@@ -65,7 +49,6 @@ export const Main = ({ userEmail }) => {
       ]
     };
   
-    // List all token transfers  *to*  myAddress:
     const toMyAddress = {
         address: contractAddress,
         topics: [
@@ -75,8 +58,14 @@ export const Main = ({ userEmail }) => {
         ]
     };
 
-    providerRef.current.on(fromMyAddress, fetchTokenData)
-    providerRef.current.on(toMyAddress, fetchTokenData)
+    provider.on(fromMyAddress, fetchTokenData)
+    provider.on(toMyAddress, fetchTokenData)
+  }
+
+  const initialize = async () => {
+    await setGlobals()
+    await fetchTokenData()
+    await registerTransferListeners()
   }
 
   const transfer = () => {
@@ -84,21 +73,39 @@ export const Main = ({ userEmail }) => {
       setAmountError(true)
       return
     }
+
     if (amountError) {
       setAmountError(false)
     }
-    tokenContractRef.current.transfer(transferData.addressTo, transferData.amount)
+
+    tokenContract.transfer(transferData.addressTo, transferData.amount)
+  }
+  
+  const isMetaMaskConnected = async () => {
+    const accounts = await provider.listAccounts()
+    setMetamaskConnected(accounts.length > 0)
   }
 
   useEffect(() => {
+    isMetaMaskConnected()
+  }, [])
+
+  useEffect(() => {
     if (metamaskConnected) {
-      initializeTokenContract()
-      fetchTokenData()
-      registerTransferListeners()
+      initialize()
     }
   }, [metamaskConnected])
 
   if (!metamaskConnected) {
+    const connectToMetamask = async () => {
+      try {
+        await provider.send("eth_requestAccounts", []);
+        setMetamaskConnected(true)
+      } catch (error) {
+        enqueueSnackbar(error.message, { variant: 'error' });
+      }
+    }
+  
     return (
       <Button variant="contained" color="secondary" onClick={connectToMetamask}>
         Connect To Metamask
@@ -107,38 +114,54 @@ export const Main = ({ userEmail }) => {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-      <p>Hello {userEmail}</p>
-      <p>Your {token.symbol} Balance: {token.myBalance.toString()}</p>
-      <p>Total {token.symbol} Supply: {token.totalSupply.toString()}</p>
+    <>
+      <Paper elevation={3} style={{ width: 500, padding: '15px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around' }}>
+          <Typography variant="h6" gutterBottom>
+            Hello {userEmail}
+          </Typography>
 
-      <div style={{ marginTop: '10px' }}>
-        <Button variant="contained" color="primary" onClick={signOutWithErrorHandling}>
-          Sign Out
-        </Button>
-      </div>
+          <Button variant="contained" color="primary" onClick={signOutWithErrorHandling}>
+            Sign Out
+          </Button>
+        </div>
+        <Typography variant="subtitle1">
+          Your {token.symbol} Balance: {token.myBalance.toString()}
+        </Typography>
+        <Typography variant="subtitle1" style={{ textOverflow: 'wrap', overflow: 'hidden', width: 250, whiteSpace: 'nowrap' }}>
+          Total {token.symbol} Supply: {token.totalSupply.toString()}
+        </Typography>
+      </Paper>
 
-      <TextField
-        id="address-to"
-        label="Address To"
-        type="text"
-        onChange={e => setTransferData({ ...transferData, addressTo: e.target.value })}
-      />
+      <Paper elevation={3} style={{ marginTop: 25, padding: '15px', width: 500, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <Typography variant="h6" gutterBottom>
+          Transfer funds
+        </Typography>
 
-      <TextField
-        id="amount"
-        label="amount"
-        type="number"
-        onChange={e => setTransferData({ ...transferData, amount: e.target.value })}
-        error={amountError}
-        helperText={amountError ? 'Amount is too big' : ''}
-      />
+        <TextField
+          id="address-to"
+          label="Address To"
+          type="text"
+          onChange={e => setTransferData({ ...transferData, addressTo: e.target.value })}
+          style={{ marginTop: '15px' }}
+        />
 
-      <div style={{ marginTop: '10px' }}>
-        <Button variant="contained" color="primary" onClick={transfer}>
-          Transfer
-        </Button>
-      </div>
-    </div>
+        <TextField
+          id="amount"
+          label="Amount"
+          type="number"
+          onChange={e => setTransferData({ ...transferData, amount: e.target.value })}
+          error={amountError}
+          helperText={amountError ? 'Amount is too big' : ''}
+          style={{ marginTop: '15px' }}
+        />
+
+        <div style={{ marginTop: '15px' }}>
+          <Button variant="contained" color="primary" onClick={transfer}>
+            Transfer
+          </Button>
+        </div>
+      </Paper>
+    </>
   )
 }
