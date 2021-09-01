@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { SignUp } from './components/SignUp'
 import { Main } from './components/Main'
+import { Top5List } from './components/Top5List'
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -15,6 +16,7 @@ const App = () => {
     <SnackbarProvider maxSnack={3}>
       <Container>
         {user ? <Main userEmail={user.email} /> : <SignUp />}
+        <Top5List />
       </Container>
     </SnackbarProvider>
   );

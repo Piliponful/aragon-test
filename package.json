@@ -9,6 +9,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "check-password-strength": "^2.0.3",
+    "coinmarketcap-api": "^3.1.1",
     "ethers": "^5.4.6",
     "firebase": "^9.0.1",
     "isemail": "^3.2.0",
@@ -16,6 +17,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "request-promise": "^4.2.6",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -41,5 +43,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "https://pro-api.coinmarketcap.com"
 }
