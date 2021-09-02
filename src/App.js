@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { SignUp } from './components/SignUp'
 import { Main } from './components/Main'
 import { Top5List } from './components/Top5List'
+import { MetamaskButton } from './components/MetamaskButton'
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -14,11 +15,13 @@ const App = () => {
 
   return (
     <SnackbarProvider maxSnack={3}>
-      <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        {!user ? <SignUp /> : null}
-        {user ? <Main userEmail={user.email} /> : null}
-        {user ? <Top5List /> : null}
-      </Container>
+      <MetamaskButton>
+        <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+          {!user ? <SignUp /> : null}
+          {user ? <Main userEmail={user.email} /> : null}
+          {user ? <Top5List /> : null}
+        </Container>
+      </MetamaskButton>
     </SnackbarProvider>
   );
 }

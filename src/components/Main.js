@@ -17,7 +17,6 @@ export const Main = ({ userEmail }) => {
   const [token, setToken] = useState({ symbol: '', myBalance: BigNumber.from('0'), totalSupply: BigNumber.from('0') })
   const [transferData, setTransferData] = useState({ addressTo: null, amount: 0 })
   const [amountError, setAmountError] = useState(false)
-  const [metamaskConnected, setMetamaskConnected] = useState(false)
   const { enqueueSnackbar } = useSnackbar();
 
   const signOutWithErrorHandling = () => {
@@ -82,38 +81,10 @@ export const Main = ({ userEmail }) => {
 
     tokenContract.transfer(transferData.addressTo, transferData.amount)
   }
-  
-  const isMetaMaskConnected = async () => {
-    const accounts = await provider.listAccounts()
-    setMetamaskConnected(accounts.length > 0)
-  }
 
   useEffect(() => {
-    isMetaMaskConnected()
+    initialize()
   }, [])
-
-  useEffect(() => {
-    if (metamaskConnected) {
-      initialize()
-    }
-  }, [metamaskConnected])
-
-  if (!metamaskConnected) {
-    const connectToMetamask = async () => {
-      try {
-        await provider.send("eth_requestAccounts", []);
-        setMetamaskConnected(true)
-      } catch (error) {
-        enqueueSnackbar(error.message, { variant: 'error' });
-      }
-    }
-  
-    return (
-      <Button variant="contained" color="secondary" onClick={connectToMetamask}>
-        Connect To Metamask
-      </Button>
-    )
-  }
 
   return (
     <>
