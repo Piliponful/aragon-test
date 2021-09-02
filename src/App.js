@@ -18,7 +18,7 @@ const App = () => {
       <MetamaskButton>
         <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
           {!user ? <SignUp /> : null}
-          {user ? <Main userEmail={user.email} /> : null}
+          {user ? <Main /> : null}
           {user ? <Top5List /> : null}
         </Container>
       </MetamaskButton>

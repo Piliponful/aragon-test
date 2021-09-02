@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Typography, Paper, TextField, Button } from '@material-ui/core';
-import { useSnackbar } from 'notistack'
-import { getAuth, signOut } from 'firebase/auth'
 import { ethers, BigNumber } from 'ethers'
 
 import { EventsList } from './EventsList'
+import { UserData } from './UserData'
 
 import tokenABI from '../contract/tokenABI.json'
 import contractAddress from '../contract/address'
@@ -13,19 +12,10 @@ const provider = new ethers.providers.Web3Provider(window.ethereum)
 let tokenContract = new ethers.Contract(contractAddress, tokenABI, provider);
 let myAddress = null
 
-export const Main = ({ userEmail }) => {
+export const Main = () => {
   const [token, setToken] = useState({ symbol: '', myBalance: BigNumber.from('0'), totalSupply: BigNumber.from('0') })
   const [transferData, setTransferData] = useState({ addressTo: null, amount: 0 })
   const [amountError, setAmountError] = useState(false)
-  const { enqueueSnackbar } = useSnackbar();
-
-  const signOutWithErrorHandling = () => {
-    try {
-      signOut(getAuth())
-    } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
-    }
-  }
 
   const setGlobals = async () => {
     const signer = provider.getSigner()
@@ -89,15 +79,7 @@ export const Main = ({ userEmail }) => {
   return (
     <>
       <Paper elevation={3} style={{ width: 500, padding: '15px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around' }}>
-          <Typography variant="h6" gutterBottom>
-            Hello {userEmail}
-          </Typography>
-
-          <Button variant="contained" color="primary" onClick={signOutWithErrorHandling}>
-            Sign Out
-          </Button>
-        </div>
+        <UserData />
         <Typography variant="subtitle1">
           Your {token.symbol} Balance: {token.myBalance.toString()}
         </Typography>
