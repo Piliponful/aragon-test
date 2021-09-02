@@ -8,6 +8,7 @@ import contractAddress from '../contract/address'
 
 export const EventsList = () => {
   const [events, setEvents] = useState([])
+  const [newEvent, setNewEvent] = useState(null)
 
   const registerEventListeners = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -19,13 +20,21 @@ export const EventsList = () => {
 
     provider.on(allEventsForTKN, newEvent => {
       const iface = new ethers.utils.Interface(tokenABI)
-      setEvents([...events, { event: newEvent, parsedLog: iface.parseLog(newEvent) }])
+      setNewEvent({ event: newEvent, parsedLog: iface.parseLog(newEvent) })
     })
   }
-  
+
   useEffect(() => {
     registerEventListeners()
   }, [])
+
+  useEffect(() => {
+    if (newEvent) {
+      setEvents([...events, newEvent])
+    }
+  }, [newEvent])
+
+  console.log(events)
 
   return (
     <Paper elevation={3} style={{ width: 500, marginTop: 25, padding: '15px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
