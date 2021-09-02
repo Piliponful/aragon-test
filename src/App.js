@@ -16,7 +16,7 @@ const App = () => {
   return (
     <SnackbarProvider maxSnack={3}>
       <MetamaskButton>
-        <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: '25px' }}>
           {!user ? <SignUp /> : null}
           {user ? <Main /> : null}
           {user ? <Top5List /> : null}

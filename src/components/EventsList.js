@@ -34,7 +34,7 @@ export const EventsList = () => {
       </Typography>
       <List dense={false}>
         {events.map((i, index) => (
-          <div key={index}>
+          <div key={i.event.transactionHash + i.event.logIndex}>
             <ListItem style={{ justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <Tooltip title="Block Number">
@@ -51,7 +51,7 @@ export const EventsList = () => {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span>{i.parsedLog.signature}</span>
                 arguments: {i.parsedLog.args.map((i, index) => (
-                  <span style={{ overflow: 'hidden', width: 250, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                  <span key={i + ''} style={{ overflow: 'hidden', width: 250, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                     {index}: {i + ''}
                   </span>
                 ))}
