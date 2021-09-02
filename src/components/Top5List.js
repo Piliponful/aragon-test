@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { List, ListItem, ListItemText, Typography, Paper } from '@material-ui/core';
+import { List, ListItem, ListItemText, Typography, Paper, Divider } from '@material-ui/core';
 
 const apiKey = 'b68a21be-5da2-441f-87d3-34cf05946b8b'
 
@@ -42,17 +42,23 @@ export const Top5List = () => {
   return (
     <Paper elevation={3} style={{ marginTop: 25, padding: '15px', width: 500, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
-        Top 5 crypto + ANT
+        Top 5 crypto
       </Typography>
       <List dense={false}>
-        {top5List.map(i => (
-          <ListItem key={i.name}>
-            <ListItemText
-              primary={i.name}
-              secondary={i.price}
-            />
-          </ListItem>
+        {top5List.map((i, index) => (
+          <div key={i.name}>
+            <ListItem>
+              <ListItemText
+                primary={i.name}
+                secondary={i.price}
+              />
+            </ListItem>
+            {index === top5List.length - 1 ? null : <Divider />}
+          </div>
         ))}
+        <Typography variant="h6" gutterBottom>
+          One and only ❤
+        </Typography>
         <ListItem>
           <ListItemText
             primary='Aragon'

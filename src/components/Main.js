@@ -4,9 +4,11 @@ import { useSnackbar } from 'notistack'
 import { getAuth, signOut } from 'firebase/auth'
 import { ethers, BigNumber } from 'ethers'
 
-import tokenABI from '../tokenABI.json'
+import { EventsList } from './EventsList'
 
-const contractAddress = '0xff10E56d8C3c1567E0c80677e26EC687B4f1D8D0'
+import tokenABI from '../contract/tokenABI.json'
+import contractAddress from '../contract/address'
+
 const provider = new ethers.providers.Web3Provider(window.ethereum)
 let tokenContract = new ethers.Contract(contractAddress, tokenABI, provider);
 let myAddress = null
@@ -128,7 +130,7 @@ export const Main = ({ userEmail }) => {
         <Typography variant="subtitle1">
           Your {token.symbol} Balance: {token.myBalance.toString()}
         </Typography>
-        <Typography variant="subtitle1" style={{ textOverflow: 'wrap', overflow: 'hidden', width: 250, whiteSpace: 'nowrap' }}>
+        <Typography variant="subtitle1" style={{ textOverflow: 'ellipsis', overflow: 'hidden', width: 250, whiteSpace: 'nowrap' }}>
           Total {token.symbol} Supply: {token.totalSupply.toString()}
         </Typography>
       </Paper>
@@ -162,6 +164,7 @@ export const Main = ({ userEmail }) => {
           </Button>
         </div>
       </Paper>
+      <EventsList />
     </>
   )
 }
