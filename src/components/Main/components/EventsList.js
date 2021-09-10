@@ -1,40 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Paper, List, ListItem, Tooltip, Typography, Link, Divider } from '@material-ui/core';
 
-import { ethers } from 'ethers'
-
-import tokenABI from '../contract/tokenABI.json'
-import contractAddress from '../contract/address'
+import { EthersContext } from '../../../contexts/Ethers';
 
 export const EventsList = () => {
+  const { provider, token } = useContext(EthersContext)
   const [events, setEvents] = useState([])
   const [newEvent, setNewEvent] = useState(null)
 
-  const registerEventListeners = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-
+  const registerEventListeners = () => {
     const allEventsForTKN = {
-      address: contractAddress,
+      address: token.address,
       topics: []
     };
 
-    provider.on(allEventsForTKN, newEvent => {
-      const iface = new ethers.utils.Interface(tokenABI)
-      setNewEvent({ event: newEvent, parsedLog: iface.parseLog(newEvent) })
-    })
+    provider.on(allEventsForTKN, newEvent => setNewEvent({ event: newEvent, parsedLog: token.iface.parseLog(newEvent) }))
   }
 
-  useEffect(() => {
-    registerEventListeners()
-  }, [])
+  useEffect(registerEventListeners, [])
 
   useEffect(() => {
     if (newEvent) {
-      setEvents([...events, newEvent])
+      setEvents(events => [...events, newEvent])
     }
   }, [newEvent])
-
-  console.log(events)
 
   return (
     <Paper elevation={3} style={{ width: 500, marginTop: 25, padding: '15px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>

@@ -38,7 +38,7 @@ export const Top5List = () => {
 
     // return () => clearInterval(interval)
   }, [])
-  
+
   return (
     <Paper elevation={3} style={{ marginTop: 25, padding: '15px', width: 500, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
@@ -56,9 +56,12 @@ export const Top5List = () => {
             {index === top5List.length - 1 ? null : <Divider />}
           </div>
         ))}
-        <Typography variant="h6" gutterBottom>
-          One and only ❤
-        </Typography>
+      </List>
+
+      <Typography variant="h6" gutterBottom>
+        One and only ❤
+      </Typography>
+      <List dense={false}>
         <ListItem>
           <ListItemText
             primary='Aragon'

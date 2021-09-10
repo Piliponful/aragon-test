@@ -8,6 +8,8 @@ import { Main } from './components/Main'
 import { Top5List } from './components/Top5List'
 import { MetamaskButton } from './components/MetamaskButton'
 
+import { EthersProvider } from './contexts/Ethers';
+
 const App = () => {
   const [user, setUser] = useState(null)
 
@@ -15,13 +17,15 @@ const App = () => {
 
   return (
     <SnackbarProvider maxSnack={3}>
-      <MetamaskButton>
-        <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: '25px' }}>
-          {!user ? <SignUp /> : null}
-          {user ? <Main /> : null}
-          {user ? <Top5List /> : null}
-        </Container>
-      </MetamaskButton>
+      <EthersProvider>
+        <MetamaskButton>
+          <Container style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: '25px' }}>
+            {!user ? <SignUp /> : null}
+            {user ? <Main /> : null}
+            {user ? <Top5List /> : null}
+          </Container>
+        </MetamaskButton>
+      </EthersProvider>
     </SnackbarProvider>
   );
 }

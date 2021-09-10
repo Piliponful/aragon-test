@@ -1,9 +1,9 @@
 import { Paper } from '@material-ui/core';
 
-import { EventsList } from './EventsList'
-import { UserData } from './UserData'
-import { Transfer } from './Transfer'
-import { TokenData } from './TokenData'
+import { EventsList } from './components/EventsList'
+import { UserData } from './components/UserData'
+import { Transfer } from './components/Transfer'
+import { TokenData } from './components/TokenData'
 
 export const Main = () => {
   return (

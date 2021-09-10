@@ -1,44 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { Button, CircularProgress } from '@material-ui/core';
-import { useSnackbar } from 'notistack'
-import { ethers } from 'ethers'
-import { debounce } from 'lodash'
 
-const provider = new ethers.providers.Web3Provider(window.ethereum)
+import { EthersContext } from '../contexts/Ethers';
 
 export const MetamaskButton = ({ children }) => {
-  const [metamaskConnected, setMetamaskConnected] = useState(null)
-  const { enqueueSnackbar } = useSnackbar();
-  
-  const isMetaMaskConnected = async () => {
-    const accounts = await provider.listAccounts()
-    debounce(() => setMetamaskConnected(accounts.length > 0), 1000)()
-  }
+  const { metamask, initialized } = useContext(EthersContext)
 
-  useEffect(() => {
-    isMetaMaskConnected()
-  }, [])
-
-  if (!metamaskConnected) {
-    const connectToMetamask = async () => {
-      try {
-        await provider.send("eth_requestAccounts", []);
-        setMetamaskConnected(true)
-      } catch (error) {
-        enqueueSnackbar(error.message, { variant: 'error' });
-      }
-    }
-  
+  if (!metamask.connected) {
     return (
       <div style={{ position: 'absolute', width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         {
-          metamaskConnected === null
-          ? <CircularProgress />
-          : (
-            <Button variant="contained" color="secondary" onClick={connectToMetamask}>
+          (metamask.connected === null || !initialized)
+            ? <CircularProgress />
+            : (
+              <Button variant="contained" color="secondary" onClick={metamask.connect}>
                 Connect To Metamask
-            </Button>
-          )
+              </Button>
+            )
         }
       </div>
     )

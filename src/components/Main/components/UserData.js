@@ -8,7 +8,6 @@ export const UserData = () => {
   const auth = getAuth()
   const userEmail = auth.currentUser.email;
 
-
   const signOutWithErrorHandling = () => {
     try {
       signOut(auth)

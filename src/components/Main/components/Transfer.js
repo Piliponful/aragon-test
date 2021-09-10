@@ -1,22 +1,15 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Typography, Paper, TextField, Button } from '@material-ui/core';
-import { ethers } from 'ethers'
 
-import tokenABI from '../contract/tokenABI.json'
-import contractAddress from '../contract/address'
+import { EthersContext } from '../../../contexts/Ethers';
 
 export const Transfer = () => {
+  const { token, myAddress } = useContext(EthersContext)
   const [transferData, setTransferData] = useState({ addressTo: null, amount: 0 })
   const [amountError, setAmountError] = useState(false)
 
   const transfer = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    let tokenContract = new ethers.Contract(contractAddress, tokenABI, provider);
-    const signer = provider.getSigner()
-    tokenContract = tokenContract.connect(signer)
-
-    const myAddress = await signer.getAddress()
-    const myBalance = await tokenContract.balanceOf(myAddress);
+    const myBalance = await token.contract.balanceOf(myAddress);
 
     if (myBalance.sub(transferData.amount).lt(0)) {
       setAmountError(true)
@@ -27,7 +20,7 @@ export const Transfer = () => {
       setAmountError(false)
     }
 
-    tokenContract.transfer(transferData.addressTo, transferData.amount)
+    token.contract.transfer(transferData.addressTo, transferData.amount)
   }
 
   return (

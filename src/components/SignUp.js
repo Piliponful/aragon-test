@@ -10,21 +10,17 @@ export const SignUp = () => {
 
   const auth = getAuth()
 
-  const signUp = async () => {
+  const catchError = async fn => {
     try {
-      await createUserWithEmailAndPassword(auth, userData.email, userData.password)
+      await fn()
     } catch (error) {
       enqueueSnackbar(error.message, { variant: 'error' });
     }
   }
 
-  const signIn = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, userData.email, userData.password)
-    } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
-    }
-  }
+  const signUp = () => catchError(() => createUserWithEmailAndPassword(auth, userData.email, userData.password))
+
+  const signIn = () => catchError(() => signInWithEmailAndPassword(auth, userData.email, userData.password))
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
